@@ -42,6 +42,7 @@ public class Compiler {
 				Instruction inns= new Instruction(ics[0],ics[1],sizeN);
 				summary.add(inns);
 				names.add(inns.instrName);
+				
 				summaryFinder.add(ics[0]);
 				
 				System.out.println(input);
