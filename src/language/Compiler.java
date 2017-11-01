@@ -63,6 +63,7 @@ public class Compiler {
 		x=c1.getIndex(summaryFinder);
 		c1.code=summary.get(x).code;
 		//test (erase)
+		
 		c1.dir="54";
 		c1.datos="AF";
 		if(x!=500){
