@@ -62,16 +62,15 @@ public class Compiler {
 		//first check if it´s in the array (non variable instructions)
 		x=c1.getIndex(summaryFinder);
 		c1.code=summary.get(x).code;
-		//test (erase)
-		
-		c1.dir="54";
-		c1.datos="AF";
 		if(x!=500){
 			System.out.println("Codigo de operación de "+text+ " es :"+c1.getCode());
 			System.out.println(summary.get(x).toString());
 		}else if(isAnInstruction(text,summary)){//now for variable instructions example: MOV A,#30
 			System.out.println("Es una instruccion variable");
 		}
+		
+		Instruction test = new Instruction();
+		System.out.println(test.isBit("TCON.7"));
 		System.out.println("Terminó la ejecuccion");
 		//tests
 		
