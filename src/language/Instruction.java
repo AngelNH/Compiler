@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+import language.symbols.StringParser;
+
 public class Instruction {
 	
 	private static List<SpecialRegister> specialRegisterBit = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",0);
@@ -120,25 +122,93 @@ public class Instruction {
 		return killme;
 	}
 	
+	public void solveInstruction(LineInstruction li, List<LineInstruction> others) {
+		String theHex=""+code;
+		if( bytes > 1 ) {//significa que hay que ir metiendo los operandos resueltos
+			for( int i = 0; i < li.getProvided().size(); i++ ) {
+				if( li.getDefinitions().get(i).equals("&") ) {
+					theHex += solveRelative(li.getProvided().get(i),others);
+				}
+				else if( li.getDefinitions().get(i).equals("$") ) {
+					theHex += solveBit(li.getProvided().get(i));
+				}
+				else if( li.getDefinitions().get(i).equals("#+") ) {
+					theHex += solveDirect(li.getProvided().get(i));
+				}
+				else if( li.getDefinitions().get(i).equals("%") ) {
+					theHex += solveInmediate(li.getProvided().get(0));
+				}
+				else { //Para direccionamientos por registro, indirectos y otros como A, C, etc.
+					
+				}
+			}
+		}
+		//poner aquí lo del formato hex-80
+		li.setHex80(theHex);
+	}
+	
 	// REL &
 	public boolean isRelative(String s){
 		// example: JNZ ETIQUETA1
 		return s.matches("^[a-zA-Z0-9_-]");
 	}
 	
+	public String solveRelative(String provided, List<LineInstruction> others) {
+		return null;
+	}
 	
-	public boolean isBit(String s){
-		
+	public boolean isBit(String provided){		
+		for(SpecialRegister sr : specialRegisterBit) {
+			if( provided.matches(String.format("[%s]{1}.[.0-7]?",sr.symbol)) ) {
+				return true;
+			}
+		}
 		
 		return false;
+	}
+	
+	public String solveBit(String provided) {
+		return null;
 	}
 	
 	public boolean isDirect(String str) {
-		return false;
+		return str.matches("[#0-9]+?.[hbd]");
+	}
+	
+	public String solveDirect(String provided) {
+		
+		return Integer.toHexString(0);
 	}
 	
 	public boolean isInmediate(String str) {
-		return false;
+		List<SpecialRegister> allRegisters = new ArrayList<>();
+		allRegisters.addAll(specialRegisterBit);
+		allRegisters.addAll(specialRegisterByte);
+		
+		for( SpecialRegister sr : allRegisters ) {
+			if( sr.symbol.equals(str) )
+				return true;
+		}
+		
+		return str.matches("[[0-9]+?].[hbd]");
+	}
+	
+	public String solveInmediate(String provided) {
+		int entero = 0;
+		if( provided.matches(".^[hbd]") ) {
+			entero = Integer.parseInt(provided, 16);
+		}
+		else if( provided.endsWith("h") ) {
+			entero = Integer.parseInt(provided.substring(0, provided.indexOf("h")), 16);
+		}
+		else if( provided.endsWith("b") ) {
+			entero = Integer.parseInt(provided.substring(0, provided.indexOf("b")), 2);
+		}
+		else if( provided.endsWith("d") ) {
+			entero = Integer.parseInt(provided.substring(0, provided.indexOf("d")), 10);
+		}
+		
+		return Integer.toHexString(entero);
 	}
 
 }
