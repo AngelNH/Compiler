@@ -12,5 +12,4 @@ public class SpecialRegister {
 		this.iDir=Integer.parseInt(d,16);
 		this.bitEnable=be;
 	}
-
 }

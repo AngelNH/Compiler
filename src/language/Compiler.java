@@ -97,6 +97,7 @@ public class Compiler {
 		if( !errores.isEmpty() ) //Para qué continuar si hay de todas formas hay errores
 			return;
 		
+		
 		if( !unresolvedInstructions.isEmpty() ) { //hay que resolver la tabla de símbolos
 			for( int i=0; i<unresolvedInstructions.size(); i++) {
 				if( unresolvedInstructions.get(i).getInstruction().canSolveSymbols(unresolvedInstructions.get(i)) ) {

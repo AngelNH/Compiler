@@ -76,7 +76,7 @@ public class Instruction {
 		boolean flag = true;
 		LineInstruction li = new LineInstruction(this,instruction,numLine,false);
 				
-		transiciones.addAll(Arrays.asList(this.instr.split(" |,"))); //Transiciones esperadas (operandos)
+		transiciones.addAll(Arrays.asList(StringParser.getTokens(this.instr))); //Transiciones esperadas (operandos)
 		if( tokens.length != transiciones.size() )
 			return null;
 		
@@ -87,7 +87,7 @@ public class Instruction {
 				li.setNeedsResolution(true);
 			}
 			else {
-				flag &= tokens[i].equals(transiciones.get(0));
+				flag &= tokens[i].equals(transiciones.get(i));
 			}
 			
 			if( !flag )
@@ -176,8 +176,22 @@ public class Instruction {
 	}
 	
 	public String solveDirect(String provided) {
+		int entero = 0;
+		provided = provided.substring(1);
+		if( provided.matches(".^[hbd]") ) {
+			entero = Integer.parseInt(provided, 16);
+		}
+		else if( provided.endsWith("h") ) {
+			entero = Integer.parseInt(provided.substring(0, provided.indexOf("h")), 16);
+		}
+		else if( provided.endsWith("b") ) {
+			entero = Integer.parseInt(provided.substring(0, provided.indexOf("b")), 2);
+		}
+		else if( provided.endsWith("d") ) {
+			entero = Integer.parseInt(provided.substring(0, provided.indexOf("d")), 10);
+		}
 		
-		return Integer.toHexString(0);
+		return Integer.toHexString(entero);
 	}
 	
 	public boolean isInmediate(String str) {

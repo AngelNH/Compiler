@@ -28,6 +28,7 @@ public class LineInstruction {
 	}
 	
 	/**
+	 * 
 	 * @return Returns the list of definitions to be solved
 	 * */
 	public List<String> getDefinitions(){

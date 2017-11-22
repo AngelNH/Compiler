@@ -22,6 +22,7 @@ public class StringParser {
 		String temp;
 		String []array;
 		
+		
 		for(String elem : line.split(" ")) { //Obtiene todas las palabras separadas por espacios
 			temp = elem.trim();
 			if( !elem.isEmpty() )
