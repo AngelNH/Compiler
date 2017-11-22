@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 
 public class Instruction {
+	//Prueba para eliminar la llamada repetitiva de LoadSpecialRegisters
+	private static List<SpecialRegister> specialRegisterBit = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",0);
+	private static List<SpecialRegister> specialRegisterByte = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",1);
 	//Necessary*************
 	public String instr;
 	public String code;
@@ -22,7 +26,7 @@ public class Instruction {
 		this.bytes=0;
 		this.specialRBit= new ArrayList<SpecialRegister>();
 		this.specialRByte= new ArrayList<SpecialRegister>();
-		this.LoadSpecialRegisters();
+		//this.LoadSpecialRegisters();
 	}
 
 	public Instruction(String instr, String code, int bytes) {
@@ -37,16 +41,37 @@ public class Instruction {
 				this.instrName+=instr.charAt(i);
 				i++;
 			}
-			this.specialRBit= new ArrayList<SpecialRegister>();
-			this.specialRByte= new ArrayList<SpecialRegister>();
-			this.LoadSpecialRegisters();
+			//this.specialRBit= new ArrayList<SpecialRegister>();
+			//this.specialRByte= new ArrayList<SpecialRegister>();
+			//this.LoadSpecialRegisters();
 	}
+	private static List<SpecialRegister> parseSFR(String ruta, int opc) { //opc decide si va a filtrar los bits o bytes. bits = 0, bytes = 1.
+		ArrayList<SpecialRegister> array = new ArrayList<>();
+		try(Scanner in = new Scanner(new File(ruta))){
+			while(in.hasNextLine()) {
+				String []ics = in.nextLine().split("-");
+				if(opc == 0 && ics[2].equals("0")) {
+					array.add(new SpecialRegister(ics[0],ics[1],ics[2]));
+				}
+				else if(opc == 1 && ics[2].equals("1")) {
+					array.add(new SpecialRegister(ics[0],ics[1],ics[2]));
+				}
+			}
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return array;
+	}
+	
 	public void LoadSpecialRegisters(){//this one maybe outside checkagain
 		Scanner in;
 		String input;
 		SpecialRegister sr;
 		int i=0;
-		File file = new File("C:\\Users\\inqui\\OneDrive\\Documentos\\ITESO\\5 Semestre\\Lenguajes Formales\\Asm-SR.txt");
+		// C:\\Users\\inqui\\OneDrive\\Documentos\\ITESO\\5 Semestre\\Lenguajes Formales\\Asm-SR.txt
+		File file = new File("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt");
 		System.out.println("Inicia carga de registros especiales ...");
 		
 		try {
@@ -169,7 +194,7 @@ public class Instruction {
 				break;
 			}
 		}
-		Iterator<SpecialRegister> it= this.specialRBit.iterator();
+		Iterator<SpecialRegister> it= Instruction.specialRegisterBit.iterator();//this.specialRBit.iterator();
 		while(it.hasNext()){
 			SpecialRegister sr =it.next();
 			if(sr.simbol.equals(check)){

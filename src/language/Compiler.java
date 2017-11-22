@@ -12,18 +12,17 @@ public class Compiler {
 		String code="";
 		String size="";
 		int sizeN=0;
-		Scanner in = new Scanner(System.in);
+		//Scanner in = new Scanner(System.in);
 		ArrayList<Instruction> summary = new ArrayList<Instruction>();
 		ArrayList<String> names = new ArrayList<String>();//Missing know which the collection
 		ArrayList<String> summaryFinder = new ArrayList<String>();
 		
-		
-		File file = new File("C:\\Users\\inqui\\OneDrive\\Documentos\\ITESO\\5 Semestre\\Lenguajes Formales\\Asm-Instr.txt");
+		// C:\\Users\\inqui\\OneDrive\\Documentos\\ITESO\\5 Semestre\\Lenguajes Formales\\Asm-Instr.txt
+		File file = new File("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-Instr.txt");
 		System.out.println("Inicia carga del diccionario...");
-		
-		
-		try {
-			in = new Scanner(file);
+	
+		try(Scanner in = new Scanner(file)) {
+			//in = new Scanner(file);
 			i=0;
 			while(in.hasNext()){
 				i=0;
@@ -49,13 +48,14 @@ public class Compiler {
 				//System.out.println();
 			}
 			System.out.println("Se ha cargado el diccionario con éxito.");
+			//in.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		//Now we have been charged the dictionary
 		// start reading the codes.
 		//String text="ADD A,#34H";
-		String text = "INC A";
+		String text = "INC PUTO";
 		Code c1 = new Code(text);
 		int x=0;
 		int index=0;
