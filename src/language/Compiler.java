@@ -18,6 +18,7 @@ public class Compiler {
 		
 		ArrayList<LineInstruction> unresolvedInstructions = new ArrayList<LineInstruction>();
 		ArrayList<LineInstruction> resolvedInstructions = new ArrayList<LineInstruction>();
+		ArrayList<LineInstruction> instructions = new ArrayList<>();
 		
 		// C:\\Users\\inqui\\OneDrive\\Documentos\\ITESO\\5 Semestre\\Lenguajes Formales\\Asm-Instr.txt
 		File diccionario = new File("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-Instr.txt");
@@ -47,7 +48,9 @@ public class Compiler {
 		try(Scanner in = new Scanner(programa)) {
 			//in = new Scanner(file);
 			while(in.hasNext()){
-				program.add(in.nextLine());
+				String line = in.nextLine();
+				if( !StringParser.ignoreLine(line) )
+					program.add(line);
 			}
 			System.out.println("Se ha cargado el programa con éxito.");
 		}
@@ -63,39 +66,41 @@ public class Compiler {
 		List<Instruction> candidatos;
 		boolean flag = false;
 		
+		int nextAddress = 0;
 		while(ite.hasNext()) { //Crea tabla de símbolos
 			lineaActual = ite.next();
-			if(!StringParser.ignoreLine(lineaActual)) {//Procesa esta linea si no está en blanco, es solo comentario, etc.
-				tokens = StringParser.getTokens(lineaActual);
-				try {
-					candidatos = summary.subList(names.indexOf(tokens[0]), names.lastIndexOf(tokens[0])+1); //si está bien, tokens[0] debería ser una instrucción
-					flag = false;
-					for(int i=0;i<candidatos.size();i++) {
-						LineInstruction li = candidatos.get(i).isThisInstruction(tokens, lineaActual, ite.nextIndex()-1);
-						if(li != null)
-						{
-							flag |= true;
-							if( li.isNeedsResolution() ) {
-								unresolvedInstructions.add(li);
-							}else {
-								resolvedInstructions.add(li);
-							}
-							
-							break; //Este ISA sólo tiene una respuesta correcta 
+			tokens = StringParser.getTokens(lineaActual);
+			try {
+				candidatos = summary.subList(names.indexOf(tokens[0]), names.lastIndexOf(tokens[0])+1); //si está bien, tokens[0] debería ser una instrucción
+				flag = false;
+				for(int i=0;i<candidatos.size();i++) {
+					LineInstruction li = candidatos.get(i).isThisInstruction(tokens, lineaActual, ite.nextIndex()-1,nextAddress);
+					if(li != null)
+					{
+						nextAddress += li.getInstruction().bytes;
+						instructions.add(li);
+						flag |= true;
+						if( li.isNeedsResolution() ) {
+							unresolvedInstructions.add(li);
+						}else {
+							resolvedInstructions.add(li);
 						}
-					}
-					if( !flag ) {
-						errores.add(lineaActual);
+
+						break; //Este ISA sólo tiene una respuesta correcta 
 					}
 				}
-				catch(IndexOutOfBoundsException | IllegalArgumentException ex) {
+				if( !flag ) {
 					errores.add(lineaActual);
 				}
+			}
+			catch(IndexOutOfBoundsException | IllegalArgumentException ex) {
+				errores.add(lineaActual);
 			}
 		}
 		
 		if( !errores.isEmpty() ) //Para qué continuar si hay de todas formas hay errores
 			return;
+		
 		
 		
 		if( !unresolvedInstructions.isEmpty() ) { //hay que resolver la tabla de símbolos

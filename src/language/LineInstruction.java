@@ -5,14 +5,16 @@ import java.util.List;
 
 public class LineInstruction {
 	private String hex80;
+	private String hex;
 	private Instruction instruction;
 	private String linea;
 	private int numLinea;
 	private boolean needsResolution;
 	private List<String> definition;
 	private List<String> provided;
+	private int address;
 	
-	public LineInstruction(Instruction instruction, String linea, int numLinea, boolean nR) {
+	public LineInstruction(Instruction instruction, String linea, int numLinea, boolean nR, int address) {
 		super();
 		this.instruction = instruction;
 		this.linea = linea;
@@ -21,10 +23,32 @@ public class LineInstruction {
 		this.definition = new ArrayList<String>();
 		this.provided = new ArrayList<String>();
 		this.hex80="";
+		this.hex="";
+		this.address=address;
+	}
+	
+	@Override public String toString() {
+		return String.format("[Hex:%s, Instruction:%s,Address:%d,NumLine:%d]",hex,instruction,address,numLinea);
+	}
+	
+	public int getAddress() {
+		return address;
 	}
 	
 	public void setHex80(String hex80) {
 		this.hex80 = hex80;
+	}
+	
+	public void setHex(String hex) {
+		this.hex = hex;
+	}
+	
+	public String getHex() {
+		return this.hex;
+	}
+	
+	public String getHex80() {
+		return this.hex80;
 	}
 	
 	/**

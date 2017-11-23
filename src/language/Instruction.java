@@ -70,21 +70,22 @@ public class Instruction {
 	 * @param tokens: instrucción filtrada en tokens
 	 * @return si lo que espera la instrucción tentativamente corresponde a la instrucción tokenizada
 	 * */
-	public LineInstruction isThisInstruction(String []tokens, String instruction, int numLine){
+	public LineInstruction isThisInstruction(String []tokens, String instruction, int numLine, int address){
 		//"ADD A,#34H"
 		ArrayList<String> transiciones = new ArrayList<String>();
 		boolean flag = true;
-		LineInstruction li = new LineInstruction(this,instruction,numLine,false);
+		LineInstruction li = new LineInstruction(this,instruction,numLine,false,address);
 				
 		transiciones.addAll(Arrays.asList(StringParser.getTokens(this.instr))); //Transiciones esperadas (operandos)
 		if( tokens.length != transiciones.size() )
 			return null;
 		
 		for(int i=0;i<transiciones.size();i++) {
-			if( transiciones.get(i).equals("&") || transiciones.get(i).equals("$") || transiciones.get(i).equals("%") || transiciones.get(i).equals("#+") ) { //Omite la comparación directa cuando se trata de &,$,%,+
+			if( transiciones.get(i).equals("&") || transiciones.get(i).equals("$") || transiciones.get(i).equals("%") || transiciones.get(i).equals("#+") ) {
 				li.getDefinitions().add(transiciones.get(i));
 				li.getProvided().add(tokens[i]);
 				li.setNeedsResolution(true);
+				flag &= li.getInstruction().canSolveSymbols(li);
 			}
 			else {
 				flag &= tokens[i].equals(transiciones.get(i));
@@ -94,7 +95,7 @@ public class Instruction {
 				return null;
 		}
 		
-		
+		solveFixedInstruction(li);
 		return li;
 	}
 	
@@ -122,6 +123,12 @@ public class Instruction {
 		return killme;
 	}
 	
+	private void solveFixedInstruction(LineInstruction li) {
+		String hex = li.getInstruction().code;
+		if( !li.isNeedsResolution() )
+			li.setHex(hex);
+	}
+	
 	public void solveInstruction(LineInstruction li, List<LineInstruction> others) {
 		String theHex=""+code;
 		if( bytes > 1 ) {//significa que hay que ir metiendo los operandos resueltos
@@ -143,6 +150,8 @@ public class Instruction {
 				}
 			}
 		}
+		
+		li.setNeedsResolution(false);
 		//poner aquí lo del formato hex-80
 		li.setHex80(theHex);
 	}
