@@ -88,7 +88,7 @@ public class Instruction {
 				flag &= li.getInstruction().canSolveSymbols(li);
 			}
 			else {
-				flag &= tokens[i].equals(transiciones.get(i));
+				flag &= tokens[i].equalsIgnoreCase(transiciones.get(i));
 			}
 			
 			if( !flag )
@@ -134,7 +134,7 @@ public class Instruction {
 		if( bytes > 1 ) {//significa que hay que ir metiendo los operandos resueltos
 			for( int i = 0; i < li.getProvided().size(); i++ ) {
 				if( li.getDefinitions().get(i).equals("&") ) {
-					theHex += solveRelative(li.getProvided().get(i),others);
+					theHex += solveRelative(li.getProvided().get(i),li,others);
 				}
 				else if( li.getDefinitions().get(i).equals("$") ) {
 					theHex += solveBit(li.getProvided().get(i));
@@ -143,10 +143,7 @@ public class Instruction {
 					theHex += solveDirect(li.getProvided().get(i));
 				}
 				else if( li.getDefinitions().get(i).equals("%") ) {
-					theHex += solveInmediate(li.getProvided().get(0));
-				}
-				else { //Para direccionamientos por registro, indirectos y otros como A, C, etc.
-					
+					theHex += solveInmediate(li.getProvided().get(i));
 				}
 			}
 		}
@@ -158,17 +155,25 @@ public class Instruction {
 	
 	// REL &
 	public boolean isRelative(String s){
-		// example: JNZ ETIQUETA1
-		return s.matches("^[a-zA-Z0-9_-]");
+		
+		return s.matches("^[a-zA-Z_][a-zA-Z_0-9]*");
 	}
 	
-	public String solveRelative(String provided, List<LineInstruction> others) {
+	public String solveRelative(String provided, LineInstruction current, List<LineInstruction> others) {
+		int direccion = 0;
+		for( LineInstruction li : others ) { //%[argument_index$][flags][width][.precision]conversion
+			if( li.getTag() != null && li.getTag().equalsIgnoreCase(provided) ) {
+				direccion = (li.getAddress())-(current.getAddress()+current.getInstruction().bytes);
+				return String.format("%08X", direccion).substring(6, 8);
+			}
+		}
+		
 		return null;
 	}
 	
-	public boolean isBit(String provided){		
+	public boolean isBit(String provided){
 		for(SpecialRegister sr : specialRegisterBit) {
-			if( provided.matches(String.format("[%s]..[.0-7]{1}",sr.symbol)) ) {
+			if( provided.matches(String.format("(?i)[%s]..[.0-7]{1}",sr.symbol)) ) {
 				return true;
 			}
 		}
@@ -188,7 +193,7 @@ public class Instruction {
 	
 	public String solveBit(String provided) {
 		for(SpecialRegister sr : specialRegisterBit) {
-			if( provided.matches(String.format("[%s]..[.0-7]{1}",sr.symbol)) ) {
+			if( provided.matches(String.format("(?i)[%s]..[.0-7]{1}",sr.symbol)) ) {
 				int suma = Integer.parseInt(provided.substring(provided.lastIndexOf(".")+1));
 				int base = sr.iDir;
 				return Integer.toHexString(base+suma);
@@ -204,6 +209,7 @@ public class Instruction {
 	
 	public String solveDirect(String provided) {
 		int entero = 0;
+		provided = provided.toLowerCase();
 		provided = provided.substring(1);
 		if( provided.matches(".^[hbd]") ) {
 			entero = Integer.parseInt(provided, 16);
@@ -227,15 +233,16 @@ public class Instruction {
 		allRegisters.addAll(specialRegisterByte);
 		
 		for( SpecialRegister sr : allRegisters ) {
-			if( sr.symbol.equals(str) )
+			if( sr.symbol.equalsIgnoreCase(str) )
 				return true;
 		}
 		
-		return str.matches("[[0-9]+?].[hbd]");
+		return str.matches("(?i)[[0-9]+?].[hbd]");
 	}
 	
 	public String solveInmediate(String provided) {
 		int entero = 0;
+		provided = provided.toLowerCase();
 		if( provided.matches(".^[hbd]") ) {
 			entero = Integer.parseInt(provided, 16);
 		}
@@ -247,6 +254,17 @@ public class Instruction {
 		}
 		else if( provided.endsWith("d") ) {
 			entero = Integer.parseInt(provided.substring(0, provided.indexOf("d")), 10);
+		}
+		else { //Busca en los registros
+			List<SpecialRegister> allRegisters = new ArrayList<>();
+			allRegisters.addAll(specialRegisterBit);
+			allRegisters.addAll(specialRegisterByte);
+			
+			for( SpecialRegister sr : allRegisters ) {
+				if( sr.symbol.equalsIgnoreCase(provided) ) {
+					entero = sr.iDir;
+				}
+			}
 		}
 		
 		return Integer.toHexString(entero);

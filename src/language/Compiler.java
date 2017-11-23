@@ -74,6 +74,7 @@ public class Compiler {
 				lineaActual = lineaActual.substring(lineaActual.indexOf(':')+1);
 			}
 			
+			lineaActual = lineaActual.toUpperCase();
 			tokens = StringParser.getTokens(lineaActual);
 			try {
 				candidatos = summary.subList(names.indexOf(tokens[0]), names.lastIndexOf(tokens[0])+1); //si está bien, tokens[0] debería ser una instrucción
@@ -111,7 +112,7 @@ public class Compiler {
 			for( int i=0; i<unresolvedInstructions.size(); i++) {
 				if( unresolvedInstructions.get(i).getInstruction().canSolveSymbols(unresolvedInstructions.get(i)) ) {
 					//mandar a llamar a la de resolver
-					unresolvedInstructions.get(i).getInstruction().solveInstruction(unresolvedInstructions.get(i), null);
+					unresolvedInstructions.get(i).getInstruction().solveInstruction(unresolvedInstructions.get(i), instructions);
 					resolvedInstructions.add(unresolvedInstructions.remove(i));
 				}
 				else
