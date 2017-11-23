@@ -129,12 +129,17 @@ public class Instruction {
 			li.setHex(hex);
 	}
 	
-	public void solveInstruction(LineInstruction li, List<LineInstruction> others) {
+	public void solveInstruction(LineInstruction li, List<LineInstruction> others) throws Exception {
 		String theHex=""+code;
 		if( bytes > 1 ) {//significa que hay que ir metiendo los operandos resueltos
 			for( int i = 0; i < li.getProvided().size(); i++ ) {
 				if( li.getDefinitions().get(i).equals("&") ) {
-					theHex += solveRelative(li.getProvided().get(i),li,others);
+					String temp = solveRelative(li.getProvided().get(i),li,others);
+					if( temp == null )
+						throw new Exception("No encontrado");
+					else {
+						theHex += temp;
+					}
 				}
 				else if( li.getDefinitions().get(i).equals("$") ) {
 					theHex += solveBit(li.getProvided().get(i));
@@ -149,8 +154,10 @@ public class Instruction {
 		}
 		
 		li.setNeedsResolution(false);
-		//poner aquí lo del formato hex-80
-		li.setHex(theHex);
+		if( !li.getInstruction().instrName.equalsIgnoreCase("ajmp") && !li.getInstruction().instrName.equalsIgnoreCase("ljmp") 
+				&& !li.getInstruction().instrName.equalsIgnoreCase("acall") && !li.getInstruction().instrName.equalsIgnoreCase("lcall") ){
+			li.setHex(theHex); //Esas instrucciones requieren un procesamiento especial
+		}
 	}
 	
 	// REL &
@@ -161,6 +168,32 @@ public class Instruction {
 	
 	public String solveRelative(String provided, LineInstruction current, List<LineInstruction> others) {
 		int direccion = 0;
+		
+		if( current.getInstruction().instrName.equalsIgnoreCase("ajmp") || current.getInstruction().instrName.equalsIgnoreCase("acall") ) { //Procesamiento individual de 
+			for( LineInstruction li : others ) { //%[argument_index$][flags][width][.precision]conversion
+				if( li.getTag() != null && li.getTag().equalsIgnoreCase(provided) ) {
+					byte mask1 = (byte) Integer.parseInt(current.getInstruction().code,16);
+					byte mask2 = (byte) li.getAddress();
+					byte mask3 = (byte) (mask2>>8);
+					mask3 &= 0x07;
+					mask3 <<= 5; //parte alta de la dirección
+					mask1 &= 0x1F;
+					mask1 = (byte) (mask1 | mask3); //primer byte
+					mask2 = (byte) (mask2 & 0xFF);
+					current.setHex(String.format("%02X%02X",mask1,mask2));
+					return "";
+				}
+			}
+		}
+		else if( current.getInstruction().instrName.equalsIgnoreCase("ljmp") || current.getInstruction().instrName.equalsIgnoreCase("lcall") ) {
+			for( LineInstruction li : others ) { //%[argument_index$][flags][width][.precision]conversion
+				if( li.getTag() != null && li.getTag().equalsIgnoreCase(provided) ) {
+					current.setHex(String.format("%02X%04X",Byte.parseByte(current.getInstruction().code,16),li.getAddress()));
+					return "";
+				}
+			}
+		}
+		
 		for( LineInstruction li : others ) { //%[argument_index$][flags][width][.precision]conversion
 			if( li.getTag() != null && li.getTag().equalsIgnoreCase(provided) ) {
 				direccion = (li.getAddress())-(current.getAddress()+current.getInstruction().bytes);

@@ -112,7 +112,12 @@ public class Compiler {
 			for( int i=0; i<unresolvedInstructions.size(); i++) {
 				if( unresolvedInstructions.get(i).getInstruction().canSolveSymbols(unresolvedInstructions.get(i)) ) {
 					//mandar a llamar a la de resolver
-					unresolvedInstructions.get(i).getInstruction().solveInstruction(unresolvedInstructions.get(i), instructions);
+					try{
+						unresolvedInstructions.get(i).getInstruction().solveInstruction(unresolvedInstructions.get(i), instructions);
+					}
+					catch(Exception ex) {
+						errores.add(unresolvedInstructions.get(i).getLinea());
+					}
 					resolvedInstructions.add(unresolvedInstructions.remove(i));
 				}
 				else
