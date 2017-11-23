@@ -69,6 +69,11 @@ public class Compiler {
 		int nextAddress = 0;
 		while(ite.hasNext()) { //Crea tabla de símbolos
 			lineaActual = ite.next();
+			String tag = StringParser.hasTag(lineaActual);
+			if( tag != null ) {
+				lineaActual = lineaActual.substring(lineaActual.indexOf(':')+1);
+			}
+			
 			tokens = StringParser.getTokens(lineaActual);
 			try {
 				candidatos = summary.subList(names.indexOf(tokens[0]), names.lastIndexOf(tokens[0])+1); //si está bien, tokens[0] debería ser una instrucción
@@ -77,6 +82,7 @@ public class Compiler {
 					LineInstruction li = candidatos.get(i).isThisInstruction(tokens, lineaActual, ite.nextIndex()-1,nextAddress);
 					if(li != null)
 					{
+						li.setTag(tag);
 						nextAddress += li.getInstruction().bytes;
 						instructions.add(li);
 						flag |= true;
@@ -100,8 +106,6 @@ public class Compiler {
 		
 		if( !errores.isEmpty() ) //Para qué continuar si hay de todas formas hay errores
 			return;
-		
-		
 		
 		if( !unresolvedInstructions.isEmpty() ) { //hay que resolver la tabla de símbolos
 			for( int i=0; i<unresolvedInstructions.size(); i++) {

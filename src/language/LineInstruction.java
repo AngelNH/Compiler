@@ -13,6 +13,7 @@ public class LineInstruction {
 	private List<String> definition;
 	private List<String> provided;
 	private int address;
+	private String tag;
 	
 	public LineInstruction(Instruction instruction, String linea, int numLinea, boolean nR, int address) {
 		super();
@@ -25,10 +26,19 @@ public class LineInstruction {
 		this.hex80="";
 		this.hex="";
 		this.address=address;
+		this.tag = "";
 	}
 	
 	@Override public String toString() {
-		return String.format("[Hex:%s, Instruction:%s,Address:%d,NumLine:%d]",hex,instruction,address,numLinea);
+		return String.format("[Hex:%s, Instruction:%s,Address:%d,NumLine:%d,Tag:%s]",hex,instruction,address,numLinea,tag);
+	}
+	
+	public void setTag(String str) {
+		tag = str;
+	}
+	
+	public String getTag() {
+		return tag;
 	}
 	
 	public int getAddress() {

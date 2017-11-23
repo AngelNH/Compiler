@@ -12,8 +12,8 @@ import language.symbols.StringParser;
 
 public class Instruction {
 	
-	private static List<SpecialRegister> specialRegisterBit = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",0);
-	private static List<SpecialRegister> specialRegisterByte = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",1);
+	private static List<SpecialRegister> specialRegisterBit = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",1);
+	private static List<SpecialRegister> specialRegisterByte = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",0);
 	//Necessary*************
 	public String instr;
 	public String code;
@@ -153,7 +153,7 @@ public class Instruction {
 		
 		li.setNeedsResolution(false);
 		//poner aquí lo del formato hex-80
-		li.setHex80(theHex);
+		li.setHex(theHex);
 	}
 	
 	// REL &
@@ -168,16 +168,34 @@ public class Instruction {
 	
 	public boolean isBit(String provided){		
 		for(SpecialRegister sr : specialRegisterBit) {
-			if( provided.matches(String.format("[%s]{1}.[.0-7]?",sr.symbol)) ) {
+			if( provided.matches(String.format("[%s]..[.0-7]{1}",sr.symbol)) ) {
 				return true;
 			}
 		}
 		
-		return false;
+		try{
+			if( provided.length() > 2 )
+				return false;
+			else {
+				Integer.parseInt(provided, 16);
+				return true;
+			}
+		}
+		catch(NumberFormatException ex) {
+			return false;
+		}
 	}
 	
 	public String solveBit(String provided) {
-		return null;
+		for(SpecialRegister sr : specialRegisterBit) {
+			if( provided.matches(String.format("[%s]..[.0-7]{1}",sr.symbol)) ) {
+				int suma = Integer.parseInt(provided.substring(provided.lastIndexOf(".")+1));
+				int base = sr.iDir;
+				return Integer.toHexString(base+suma);
+			}
+		}	
+		
+		return provided;
 	}
 	
 	public boolean isDirect(String str) {

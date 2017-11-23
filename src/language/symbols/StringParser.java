@@ -17,11 +17,18 @@ public class StringParser {
 		return false;
 	}
 	
+	public static String hasTag(String line) {
+		if( line.indexOf(':') > -1 ) {
+			return line.substring(0, line.indexOf(':'));
+		}
+		
+		return null;
+	}
+	
 	public static String []getTokens(String line){
 		ArrayList<String> str = new ArrayList<>();
 		String temp;
 		String []array;
-		
 		
 		for(String elem : line.split(" ")) { //Obtiene todas las palabras separadas por espacios
 			temp = elem.trim();
