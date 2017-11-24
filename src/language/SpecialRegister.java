@@ -1,16 +1,15 @@
 package language;
 
 public class SpecialRegister {
-	String simbol;
-	String sdir;
-	int dir;
+	String symbol;
+	String sDir;
+	int iDir;
 	String bitEnable;
+	
 	public SpecialRegister(String s, String d, String be) {
-		this.simbol=s;
-		//this.dir=d;
-		this.sdir=d;
-		this.dir=Integer.parseInt(d,16);
+		this.symbol=s;
+		this.sDir=d;
+		this.iDir=Integer.parseInt(d,16);
 		this.bitEnable=be;
 	}
-
 }
