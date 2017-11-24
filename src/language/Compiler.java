@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import language.symbols.StringParser;
 
 public class Compiler {
@@ -95,16 +97,16 @@ public class Compiler {
 					}
 				}
 				if( !flag ) {
-					errorBuffer.add(ite.nextIndex()-1);
+					errorBuffer.add(ite.nextIndex());
 				}
 			}
 			catch(IndexOutOfBoundsException | IllegalArgumentException ex) {
-				errorBuffer.add(ite.nextIndex()-1);
+				errorBuffer.add(ite.nextIndex());
 			}
 		}
 		
-		if( errorBuffer.isEmpty() ) //Para qué continuar si hay de todas formas hay errores
-			return null;
+		/*if( !errorBuffer.isEmpty() ) //Para qué continuar si hay de todas formas hay errores
+			return instructions;*/
 		
 		if( !unresolvedInstructions.isEmpty() ) { //hay que resolver la tabla de símbolos
 			for( int i=0; i<unresolvedInstructions.size(); i++) {
@@ -114,13 +116,13 @@ public class Compiler {
 						unresolvedInstructions.get(i).getInstruction().solveInstruction(unresolvedInstructions.get(i), instructions);
 					}
 					catch(Exception ex) {
-						errorBuffer.add(unresolvedInstructions.get(i).getNumLinea());
+						errorBuffer.add(unresolvedInstructions.get(i).getNumLinea()+1);
 					}
 					resolvedInstructions.add(unresolvedInstructions.remove(i));
 				}
 				else
 				{
-					errorBuffer.add(unresolvedInstructions.get(i).getNumLinea());
+					errorBuffer.add(unresolvedInstructions.get(i).getNumLinea()+1);
 				}
 			}
 		}
@@ -131,7 +133,19 @@ public class Compiler {
 	}
 	
 	public static void main(String[] args) {
-		String input="";
+		List<Integer> errores = new ArrayList<>();
+		List<LineInstruction> all = 
+		Compiler.compile(new File("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-Instr.txt"),
+				new File("C:\\Users\\Juan\\Documents\\Keil uVision Projects\\Ejem 1\\Prueba.a51"),
+				errores);
+		if( errores.size() > 0 ) {
+			System.out.printf("Errores, revisar líneas %s",errores.toString());
+		}
+		else {
+			System.out.println(all.toString());
+			System.out.printf("Éxito, código:\n%s",generateHex(all));
+		}
+		/*String input="";
 		int sizeN=0;
 		
 		ArrayList<Instruction> summary = new ArrayList<Instruction>(); //Lista de prototipo de instrucciones
@@ -250,6 +264,74 @@ public class Compiler {
 			}
 		}
 		
-		instructions.sort((LineInstruction l1, LineInstruction l2)->Integer.compare(l1.getAddress(), l2.getAddress()));
+		instructions.sort((LineInstruction l1, LineInstruction l2)->Integer.compare(l1.getAddress(), l2.getAddress()));*/
+	}
+	
+	public static String generateHex(List<LineInstruction> line) {
+		String hex="";
+		String direction="0000";
+		String hexline = direction+"00";
+		int eol =0;
+		int pc = 0;
+
+		for(LineInstruction c : line){
+			//System.out.println("Instruccion: "+ c.instr);
+			//System.out.println("Codigo: "+ c.getCode());
+			//System.out.println("Bytes: "+ c.bytes);
+			if(eol<16){
+				hexline+=c.getHex();
+				eol+=c.getInstruction().bytes;
+				pc+=c.getInstruction().bytes;
+			}else{
+				//line full
+				hexline = ":10"+hexline;
+				hexline += checkSum(hexline);
+				hex+=hexline+"\n";
+				eol = 0;
+				direction = "00"+ Integer.toHexString(pc);//just in case is only 2 numbers
+				hexline = direction+"00";
+			}
+		}
+		//there are no instructions left
+		if(eol==0) {
+			hexline=":00000001FF";
+		}else {
+			hexline = ":0"+Integer.toHexString(eol)+hexline;
+			hexline+= checkSum(hexline);
+			hex+=hexline+"\n";
+			hexline=":00000001FF";
+		}
+		hex+=hexline;
+		return hex.toUpperCase();
+	}
+
+	private static String checkSum(String hexline) {
+		String cs="";
+		int checksum=0;
+		int actual=1;
+		String aux="";
+		int x=0;
+		boolean flag=true;
+		
+		while(hexline.length()!=actual){
+			if(flag){//first digit
+				aux=""+hexline.charAt(actual);
+				flag=false;
+				actual++;
+			}else {// second digit
+				flag=true;
+				aux+=""+hexline.charAt(actual);
+				actual++;
+				//now we have it formed
+				x=Integer.parseInt(aux, 16);//hex2decimal(aux);
+				checksum+=x;
+			}
+		}
+		
+		checksum = ~checksum;
+		checksum++;
+		aux=Integer.toHexString(checksum);
+		cs =""+aux.charAt(6)+aux.charAt(7);
+		return cs;
 	}
 }

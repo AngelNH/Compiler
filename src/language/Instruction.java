@@ -41,6 +41,8 @@ public class Instruction {
 		}
 	}
 	
+	
+	
 	private static List<SpecialRegister> parseSFR(String ruta, int opc) { //opc decide si va a filtrar los bits o bytes. bits = 0, bytes = 1.
 		ArrayList<SpecialRegister> array = new ArrayList<>();
 		try(Scanner in = new Scanner(new File(ruta))){
