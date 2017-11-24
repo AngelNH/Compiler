@@ -12,8 +12,8 @@ import language.symbols.StringParser;
 
 public class Instruction {
 	
-	private static List<SpecialRegister> specialRegisterBit = parseSFR("C://Users//artur//Desktop//Asm-Instr.txt",1);
-	private static List<SpecialRegister> specialRegisterByte = parseSFR("C://Users//artur//Desktop//Asm-SR.txt",0);
+	private static List<SpecialRegister> specialRegisterBit = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",1);
+	private static List<SpecialRegister> specialRegisterByte = parseSFR("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-SR.txt",0);
 	//Necessary*************
 	public String instr;
 	public String code;
