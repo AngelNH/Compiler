@@ -133,18 +133,18 @@ public class Compiler {
 	}
 	
 	public static void main(String[] args) {
-		List<Integer> errores = new ArrayList<>();
+		/*List<Integer> errores = new ArrayList<>();
 		List<LineInstruction> all = 
-		Compiler.compile(new File("C:\\Users\\Juan\\Desktop\\Lenguajes\\Asm-Instr.txt"),
-				new File("C:\\Users\\Juan\\Documents\\Keil uVision Projects\\Ejem 1\\Prueba.a51"),
+		Compiler.compile(new File("C://Users//artur//Desktop//Asm-Instr.txt"),
+				new File("C://Users//artur//Desktop//test.a51"),
 				errores);
 		if( errores.size() > 0 ) {
 			System.out.printf("Errores, revisar líneas %s",errores.toString());
 		}
 		else {
-			System.out.println(all.toString());
+			//System.out.println(all.toString());
 			System.out.printf("Éxito, código:\n%s",generateHex(all));
-		}
+		}*/
 		/*String input="";
 		int sizeN=0;
 		
