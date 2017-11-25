@@ -25,6 +25,16 @@ public class StringParser {
 		return null;
 	}
 	
+	public static String cleanInstruction(String line){
+		for(int i = 0; i < line.length(); i++){
+			if(line.charAt(i)==';'){
+				line = line.substring(0,i);
+			}
+		}
+		line = line.trim();
+		return line;
+	}
+	
 	public static String []getTokens(String line){
 		ArrayList<String> str = new ArrayList<>();
 		String temp;

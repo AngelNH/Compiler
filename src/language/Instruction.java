@@ -12,7 +12,7 @@ import language.symbols.StringParser;
 
 public class Instruction {
 	
-	private static List<SpecialRegister> specialRegisterBit = parseSFR("C://Users//artur//Desktop//Asm-Instr.txt",1);
+	private static List<SpecialRegister> specialRegisterBit = parseSFR("C://Users//artur//Desktop//Asm-SR.txt",1);
 	private static List<SpecialRegister> specialRegisterByte = parseSFR("C://Users//artur//Desktop//Asm-SR.txt",0);
 	//Necessary*************
 	public String instr;
@@ -208,18 +208,27 @@ public class Instruction {
 	
 	public boolean isBit(String provided){
 		for(SpecialRegister sr : specialRegisterBit) {
-			if( provided.matches(String.format("(?i)[%s]..[.0-7]{1}",sr.symbol)) ) {
+			if( provided.matches(String.format("(?i)(%s)[.0-7]??",sr.symbol)) ) {
 				return true;
 			}
 		}
 		
 		try{
-			if( provided.length() > 2 )
-				return false;
-			else {
-				Integer.parseInt(provided, 16);
-				return true;
+			int test=-1;
+			int base = 0;
+			if( provided.endsWith("H") ){
+				base = 16;
+			}else if( provided.endsWith("B") ){
+				base = 2;
+			}else if( provided.endsWith("D") ){
+				base = 10;
 			}
+			
+			test = Integer.parseUnsignedInt(provided.substring(0,provided.length()-1), base);
+			if( test > -1 && test < 256 )
+				return true;
+			
+			return false;
 		}
 		catch(NumberFormatException ex) {
 			return false;
@@ -228,18 +237,32 @@ public class Instruction {
 	
 	public String solveBit(String provided) {
 		for(SpecialRegister sr : specialRegisterBit) {
-			if( provided.matches(String.format("(?i)[%s]..[.0-7]{1}",sr.symbol)) ) {
-				int suma = Integer.parseInt(provided.substring(provided.lastIndexOf(".")+1));
+			if( provided.matches(String.format("(?i)(%s)[.0-7]??",sr.symbol)) ) {
+				int suma=0;
+				if(provided.matches(String.format("(?i)(%s)[.0-7]{1}",sr.symbol))){
+					
+					suma = Integer.parseInt(provided.substring(provided.lastIndexOf(".")+1));
+				}
+				
 				int base = sr.iDir;
 				return Integer.toHexString(base+suma);
 			}
-		}	
+		}
 		
-		return provided;
+		int base = 0;
+		if( provided.endsWith("H") ){
+			base = 16;
+		}else if( provided.endsWith("B") ){
+			base = 2;
+		}else if( provided.endsWith("D") ){
+			base = 10;
+		}
+		
+		return String.format("%02X",Integer.parseUnsignedInt(provided.substring(0,provided.length()-1), base));
 	}
 	
 	public boolean isDirect(String str) {
-		return str.matches("[#0-9]+?.[hbd]");
+		return str.matches("(?i)[#0-9]+?.[hbd]");
 	}
 	
 	public String solveDirect(String provided) {

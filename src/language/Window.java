@@ -2,7 +2,10 @@ package language;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -29,6 +32,12 @@ import javafx.scene.layout.GridPane;
 
 public class Window extends Application {
 	File program = null;
+	String salida = "";
+	
+	public void setSalida(String str){
+		salida = str;
+	}
+	
 	@Override
 	public void start(Stage stage) throws Exception {
 		Platform.setImplicitExit(true);
@@ -127,8 +136,10 @@ public class Window extends Application {
 						temp += li.getHex80();
 					}
 				}*/
-				if(errorBuffer.isEmpty())
-					taTgt.setText(Compiler.generateHex(instructions));
+				if(errorBuffer.isEmpty()){
+					salida = Compiler.generateHex(instructions);
+					taTgt.setText(salida);
+				}
 				else{
 					tfError.setText("Error, revisar líneas " + errorBuffer);
 				}
@@ -146,7 +157,8 @@ public class Window extends Application {
 				fileChooser.setTitle("Save HEX");
 				File file = fileChooser.showSaveDialog(stage);
 				try {
-					writeToFile(file, taTgt.getText());
+					System.out.println(salida);
+					writeToFile(file, salida);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -180,20 +192,16 @@ public class Window extends Application {
 	}
 
 	public static void writeToFile(File file, String code) throws IOException {
-		Path path = Paths.get(file.getAbsolutePath());
-		FileChannel outChannel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-		ByteBuffer bb = ByteBuffer.allocate(code.length());
-		bb.asCharBuffer();
-		CharBuffer cb = CharBuffer.allocate(code.length());
-		for (char c : code.toCharArray()) {
-			cb.put(c);
+		String []lineas = code.split(":");
+		try(BufferedWriter asd = new BufferedWriter(new FileWriter(file))){
+			for( String linea : lineas ){
+				if( linea.length() > 0 ){
+					asd.write(":"+linea);
+					asd.newLine();
+				}
+			}
 		}
-		cb.flip();
-		Charset cSet = Charset.forName("UTF-8");
-		CharsetEncoder encoder = cSet.newEncoder();
-		bb = encoder.encode(cb);
-		outChannel.write(bb);
-		outChannel.close();
+		
 	}
 
 	public static void main(String[] args) {
