@@ -19,7 +19,7 @@ public class StringParser {
 	
 	public static String hasTag(String line) {
 		if( line.indexOf(':') > -1 ) {
-			return line.substring(0, line.indexOf(':'));
+			return line.substring(0, line.indexOf(':')).trim();
 		}
 		
 		return null;

@@ -49,7 +49,7 @@ public class Window extends Application {
 		GridPane grid = new GridPane();
 		
 		grid.setHgap(20);
-		grid.setPrefSize(1400, 900);
+		grid.setPrefSize(1080, 720);
 		grid.setVgap(15);
 		grid.setPadding(new Insets(15));
 
@@ -129,7 +129,7 @@ public class Window extends Application {
 			public void handle(ActionEvent event) {
 				List<LineInstruction> instructions = new ArrayList<LineInstruction>();
 				List<Integer> errorBuffer = new ArrayList<Integer>();
-				instructions = Compiler.compile(new File("C://Users//artur//Desktop//Asm-Instr.txt"), program, errorBuffer);
+				instructions = Compiler.compile(program, errorBuffer);
 				//String temp = "";
 				/*if(!errorBuffer.isEmpty()){
 					for(LineInstruction li : instructions){
@@ -175,8 +175,7 @@ public class Window extends Application {
 		FileChannel inChannel = FileChannel.open(path, StandardOpenOption.READ);
 
 		// Crear ByteBuffer
-		int capacity = 999999999;
-		ByteBuffer bb = ByteBuffer.allocate(capacity);
+		ByteBuffer bb = ByteBuffer.allocate((int) file.length());
 		int bytesRead = inChannel.read(bb);
 		String code = "";
 		bb.flip();

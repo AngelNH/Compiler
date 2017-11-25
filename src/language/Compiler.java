@@ -10,7 +10,9 @@ import language.symbols.StringParser;
 
 public class Compiler {
 	
-	public static List<LineInstruction> compile(File diccionario, File programa, List<Integer> errorBuffer) {
+	private static File diccionario = new File(Compiler.class.getResource("Asm-Instr.txt").getPath());
+	
+	public static List<LineInstruction> compile(File programa, List<Integer> errorBuffer) {
 		ArrayList<Instruction> summary = new ArrayList<Instruction>(); //Lista de prototipo de instrucciones
 		ArrayList<String> names = new ArrayList<String>(); //Lista de los nombres de los prototipos de las intrucciones
 		ArrayList<String> program = new ArrayList<String>(); //El programa del archivo ensamblador

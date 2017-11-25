@@ -12,8 +12,8 @@ import language.symbols.StringParser;
 
 public class Instruction {
 	
-	private static List<SpecialRegister> specialRegisterBit = parseSFR("C://Users//artur//Desktop//Asm-SR.txt",1);
-	private static List<SpecialRegister> specialRegisterByte = parseSFR("C://Users//artur//Desktop//Asm-SR.txt",0);
+	private static List<SpecialRegister> specialRegisterBit = parseSFR(Instruction.class.getResource("Asm-SR.txt").getPath(),1);
+	private static List<SpecialRegister> specialRegisterByte = parseSFR(Instruction.class.getResource("Asm-SR.txt").getPath(),0);
 	//Necessary*************
 	public String instr;
 	public String code;
@@ -262,7 +262,7 @@ public class Instruction {
 	}
 	
 	public boolean isDirect(String str) {
-		return str.matches("(?i)[#0-9]+?.[hbd]");
+		return str.matches("(?i)[#0-9a-f]+?.[hbd]");
 	}
 	
 	public String solveDirect(String provided) {
@@ -282,7 +282,7 @@ public class Instruction {
 			entero = Integer.parseInt(provided.substring(0, provided.indexOf("d")), 10);
 		}
 		
-		return Integer.toHexString(entero);
+		return String.format("%02X",entero);
 	}
 	
 	public boolean isInmediate(String str) {
