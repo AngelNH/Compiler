@@ -149,7 +149,7 @@ public class Compiler {
 				hexline+=c.getHex();
 				eol+=c.getInstruction().bytes;
 				pc+=c.getInstruction().bytes;
-			}else{
+			}else if(eol >= 16){
 				//line full
 				hexline = ":10"+hexline;
 				hexline += checkSum(hexline);
@@ -157,6 +157,10 @@ public class Compiler {
 				eol = 0;
 				direction = "00"+ Integer.toHexString(pc);//just in case is only 2 numbers
 				hexline = direction+"00";
+				
+				hexline+=c.getHex();
+				eol+=c.getInstruction().bytes;
+				pc+=c.getInstruction().bytes;
 			}
 		}
 		//there are no instructions left
