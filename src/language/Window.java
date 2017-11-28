@@ -137,7 +137,7 @@ public class Window extends Application {
 					}
 				}*/
 				if(errorBuffer.isEmpty()){
-					salida = Compiler.generateHex(instructions);
+					salida = Compiler.generateHex1(instructions);
 					taTgt.setText(salida);
 				}
 				else{
@@ -196,7 +196,7 @@ public class Window extends Application {
 			for( String linea : lineas ){
 				if( linea.length() > 0 ){
 					asd.write(":"+linea);
-					asd.newLine();
+					//asd.newLine();
 				}
 			}
 		}

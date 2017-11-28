@@ -136,7 +136,38 @@ public class Compiler {
 		return instructions;
 	}
 	
+	public static String generateHex1(List<LineInstruction> line) {
+		String rawLine = "";
+		String val = "";
+		int nextAddress = 0, len = 0;
+		boolean check = true;
+		
+		for(LineInstruction li : line) {
+			for( int i = 0; i < li.getHex().length(); i+=2 ) {
+				len++;
+				rawLine += li.getHex().substring(i, i+2);
+				check = true;
+				if( len > 15 ){
+					val += String.format(":%02X%04X00%s%s\n",len,nextAddress,rawLine,checkSum(String.format(":%02X%04X00%s",len,nextAddress,rawLine)));
+					nextAddress += len;
+					len = 0;
+					rawLine = "";
+					check = false;
+				}
+			}
+		}
+		
+		if( check ) {
+			val += String.format(":%02X%04X00%s%s\n",len,nextAddress,rawLine,checkSum(String.format(":%02X%04X00%s",len,nextAddress,rawLine)));
+		}
+		
+		val += ":00000001FF\n";
+		
+		return val.toUpperCase();
+	}
+	
 	public static String generateHex(List<LineInstruction> line) {
+		generateHex1(line);
 		String hex="";
 		String direction="0000";
 		String hexline = direction+"00";

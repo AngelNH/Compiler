@@ -133,6 +133,7 @@ public class Instruction {
 	
 	public void solveInstruction(LineInstruction li, List<LineInstruction> others) throws Exception {
 		String theHex=""+code;
+		String []especial = new String[2];
 		if( bytes > 1 ) {//significa que hay que ir metiendo los operandos resueltos
 			for( int i = 0; i < li.getProvided().size(); i++ ) {
 				if( li.getDefinitions().get(i).equals("&") ) {
@@ -150,13 +151,19 @@ public class Instruction {
 					theHex += solveDirect(li.getProvided().get(i));
 				}
 				else if( li.getDefinitions().get(i).equals("%") ) {
-					theHex += solveInmediate(li.getProvided().get(i));
+					if( li.getInstruction().code.equalsIgnoreCase("85") ){
+						especial[i] = solveInmediate(li.getProvided().get(i));
+					}
+					else
+						theHex += solveInmediate(li.getProvided().get(i));
 				}
 			}
 		}
 		
 		li.setNeedsResolution(false);
-		if( !li.getInstruction().instrName.equalsIgnoreCase("ajmp") && !li.getInstruction().instrName.equalsIgnoreCase("ljmp") 
+		if( li.getInstruction().code.equalsIgnoreCase("85") ) {
+			li.setHex(theHex+especial[1]+especial[0]);
+		}else if( !li.getInstruction().instrName.equalsIgnoreCase("ajmp") && !li.getInstruction().instrName.equalsIgnoreCase("ljmp") 
 				&& !li.getInstruction().instrName.equalsIgnoreCase("acall") && !li.getInstruction().instrName.equalsIgnoreCase("lcall") ){
 			li.setHex(theHex); //Esas instrucciones requieren un procesamiento especial
 		}
