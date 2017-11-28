@@ -49,7 +49,7 @@ public class Window extends Application {
 		GridPane grid = new GridPane();
 		
 		grid.setHgap(20);
-		grid.setPrefSize(1080, 720);
+		grid.setPrefSize(1500, 800);
 		grid.setVgap(15);
 		grid.setPadding(new Insets(15));
 
@@ -77,8 +77,9 @@ public class Window extends Application {
 		btSave.setPrefWidth(130);
 		btLoad.setPrefWidth(130);
 		btCompile.setPrefWidth(130);
-		taSrc.setPrefSize(680, 750);
-		taTgt.setPrefSize(680, 750);
+		taSrc.setPrefSize(730, 750);
+		taTgt.setPrefSize(730, 750);
+		taTgt.setStyle("-fx-font-size: 22px");
 		taSrc.setEditable(false);
 		taTgt.setEditable(false);
 		tfError.setEditable(false);
