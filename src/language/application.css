@@ -2,7 +2,7 @@
 
 GridPane{
 	/*Modificando el color del fondo y el efecto*/
-	-fx-background-color:#E0FFFF;
+	-fx-background-color:#B0C4DE;
 	-fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );
 	
 }
